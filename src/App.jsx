@@ -106,7 +106,7 @@ const App = () => {
             </option>
           ))}
         </select>
-        <div>
+        <div className="tags-list">
           <p>Tags:</p>
           {tagsOptions.map((tag, index) => (
             <label key={index}>
@@ -117,15 +117,11 @@ const App = () => {
                 checked={formData.tags.includes(tag)}
                 onChange={handleChange}
               />
-              {tag}
+              <span>{tag}</span>
             </label>
           ))}
         </div>
-        <input
-          type="file"
-          name="image"
-          onChange={handleChange}
-        />
+        <input type="file" name="image" onChange={handleChange} />
         <label>
           <input
             type="checkbox"
@@ -135,11 +131,7 @@ const App = () => {
           />
           Pubblicato
         </label>
-        <select
-          name="status"
-          value={formData.status}
-          onChange={handleChange}
-        >
+        <select name="status" value={formData.status} onChange={handleChange}>
           <option value="draft">Draft</option>
           <option value="published">Published</option>
         </select>
@@ -148,6 +140,13 @@ const App = () => {
       <ul>
         {articles.map((article, index) => (
           <li key={index}>
+            {article.image && (
+              <img
+                src={`path/to/images/${article.image}`}
+                alt={article.title}
+                className="post-image"
+              />
+            )}
             <div>
               {editingIndex === index ? (
                 <>
@@ -168,13 +167,18 @@ const App = () => {
                   <p>Tags: {article.tags.join(", ")}</p>
                   <p>Pubblicato: {article.published ? "Sì" : "No"}</p>
                   <p>Immagine: {article.image || "Nessuna immagine"}</p>
-                  <button onClick={() => handleEdit(index)}>✏️</button>
                 </>
               )}
             </div>
-            <button className="delete" onClick={() => handleDelete(index)}>
-              🗑️
-            </button>
+            <div className="post-actions">
+              <button onClick={() => handleEdit(index)}>✏️ Modifica</button>
+              <button
+                className="delete"
+                onClick={() => handleDelete(index)}
+              >
+                🗑️ Elimina
+              </button>
+            </div>
           </li>
         ))}
       </ul>
