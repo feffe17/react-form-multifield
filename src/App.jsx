@@ -10,7 +10,6 @@ const App = () => {
     tags: [],
     status: "draft",
     image: "",
-    published: false,
   });
 
   const [articles, setArticles] = useState([]);
@@ -28,8 +27,6 @@ const App = () => {
         ? [...formData.tags, value]
         : formData.tags.filter((tag) => tag !== value);
       setFormData({ ...formData, tags: newTags });
-    } else if (type === "checkbox" && name === "published") {
-      setFormData({ ...formData, published: checked });
     } else if (type === "file") {
       setFormData({ ...formData, image: e.target.files[0]?.name || "" });
     } else {
@@ -39,18 +36,33 @@ const App = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    if (!formData.title.trim() || !formData.author.trim()) return;
-    setArticles([...articles, formData]);
-    setFormData({
-      title: "",
-      author: "",
-      content: "",
-      category: "news",
-      tags: [],
-      status: "draft",
-      image: "",
-      published: false,
-    });
+
+    if (!formData.title.trim() || !formData.author.trim()) {
+      alert("Il titolo e l'autore sono obbligatori!");
+      return;
+    }
+
+    // Mostra un alert di conferma prima di aggiungere l'articolo
+    const confirmAdd = window.confirm(
+      `Sei sicuro di voler aggiungere il seguente post?\n\n` +
+      `Titolo: ${formData.title}\n` +
+      `Autore: ${formData.author}\n` +
+      `Categoria: ${formData.category}\n` +
+      `Tags: ${formData.tags.join(", ")}\n`
+    );
+
+    if (confirmAdd) {
+      setArticles([...articles, formData]);
+      setFormData({
+        title: "",
+        author: "",
+        content: "",
+        category: "news",
+        tags: [],
+        status: "draft",
+        image: "",
+      });
+    }
   };
 
   const handleDelete = (index) => {
@@ -122,15 +134,6 @@ const App = () => {
           ))}
         </div>
         <input type="file" name="image" onChange={handleChange} />
-        <label>
-          <input
-            type="checkbox"
-            name="published"
-            checked={formData.published}
-            onChange={handleChange}
-          />
-          Pubblicato
-        </label>
         <select name="status" value={formData.status} onChange={handleChange}>
           <option value="draft">Draft</option>
           <option value="published">Published</option>
@@ -165,7 +168,6 @@ const App = () => {
                   <p>{article.content}</p>
                   <p>Categoria: {article.category}</p>
                   <p>Tags: {article.tags.join(", ")}</p>
-                  <p>Pubblicato: {article.published ? "Sì" : "No"}</p>
                   <p>Immagine: {article.image || "Nessuna immagine"}</p>
                 </>
               )}
