@@ -5,22 +5,52 @@ const App = () => {
   const [formData, setFormData] = useState({
     title: "",
     author: "",
+    content: "",
+    category: "news",
+    tags: [],
     status: "draft",
+    image: "",
+    published: false,
   });
+
   const [articles, setArticles] = useState([]);
   const [editingIndex, setEditingIndex] = useState(null);
   const [editingTitle, setEditingTitle] = useState("");
 
+  const categories = ["news", "tech", "lifestyle"];
+  const tagsOptions = ["React", "JavaScript", "CSS", "HTML"];
+
   const handleChange = (e) => {
-    const { name, value } = e.target;
-    setFormData({ ...formData, [name]: value });
+    const { name, value, type, checked } = e.target;
+
+    if (type === "checkbox" && name === "tags") {
+      const newTags = checked
+        ? [...formData.tags, value]
+        : formData.tags.filter((tag) => tag !== value);
+      setFormData({ ...formData, tags: newTags });
+    } else if (type === "checkbox" && name === "published") {
+      setFormData({ ...formData, published: checked });
+    } else if (type === "file") {
+      setFormData({ ...formData, image: e.target.files[0]?.name || "" });
+    } else {
+      setFormData({ ...formData, [name]: value });
+    }
   };
 
   const handleSubmit = (e) => {
     e.preventDefault();
     if (!formData.title.trim() || !formData.author.trim()) return;
     setArticles([...articles, formData]);
-    setFormData({ title: "", author: "", status: "draft" });
+    setFormData({
+      title: "",
+      author: "",
+      content: "",
+      category: "news",
+      tags: [],
+      status: "draft",
+      image: "",
+      published: false,
+    });
   };
 
   const handleDelete = (index) => {
@@ -59,7 +89,57 @@ const App = () => {
           onChange={handleChange}
           placeholder="Autore dell'articolo"
         />
-        <select name="status" value={formData.status} onChange={handleChange}>
+        <textarea
+          name="content"
+          value={formData.content}
+          onChange={handleChange}
+          placeholder="Contenuto dell'articolo"
+        ></textarea>
+        <select
+          name="category"
+          value={formData.category}
+          onChange={handleChange}
+        >
+          {categories.map((category, index) => (
+            <option key={index} value={category}>
+              {category}
+            </option>
+          ))}
+        </select>
+        <div>
+          <p>Tags:</p>
+          {tagsOptions.map((tag, index) => (
+            <label key={index}>
+              <input
+                type="checkbox"
+                name="tags"
+                value={tag}
+                checked={formData.tags.includes(tag)}
+                onChange={handleChange}
+              />
+              {tag}
+            </label>
+          ))}
+        </div>
+        <input
+          type="file"
+          name="image"
+          onChange={handleChange}
+        />
+        <label>
+          <input
+            type="checkbox"
+            name="published"
+            checked={formData.published}
+            onChange={handleChange}
+          />
+          Pubblicato
+        </label>
+        <select
+          name="status"
+          value={formData.status}
+          onChange={handleChange}
+        >
           <option value="draft">Draft</option>
           <option value="published">Published</option>
         </select>
@@ -81,7 +161,13 @@ const App = () => {
                 </>
               ) : (
                 <>
-                  <strong>{article.title}</strong> - {article.author} ({article.status})
+                  <strong>{article.title}</strong> - {article.author} (
+                  {article.status})
+                  <p>{article.content}</p>
+                  <p>Categoria: {article.category}</p>
+                  <p>Tags: {article.tags.join(", ")}</p>
+                  <p>Pubblicato: {article.published ? "Sì" : "No"}</p>
+                  <p>Immagine: {article.image || "Nessuna immagine"}</p>
                   <button onClick={() => handleEdit(index)}>✏️</button>
                 </>
               )}
